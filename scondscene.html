@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<title>Multi Line Chart</title>
+<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+<style>
+    /* AXES */
+    /* ticks */
+    .axis line{
+    stroke: #706f6f;
+    stroke-width: 0.5;
+    shape-rendering: crispEdges;
+    }
+    
+    /* axis contour */
+    .axis path {
+    stroke: #706f6f;
+    stroke-width: 0.7;
+    shape-rendering: crispEdges;
+    }
+    
+    /* axis text */
+    .axis text {
+    fill: #2b2929;
+    font-family: Georgia;
+    font-size: 120%;
+    }
+    
+    /* LINE CHART */
+    path.line-0 {
+    fill: none;
+    stroke: #ed3700;
+    }
+    
+    .dot-0 {
+    fill: #fa0101;
+    stroke: #fff;
+}
+    
+    .line {
+    fill: none;
+    stroke: #0884e9;
+    stroke-width: 2;
+}
+    
+    .dot {
+    fill: steelblue;
+    stroke: #fff;
+
+}
+
+div.tooltip {   
+    position: absolute;         
+    text-align: center;         
+    width: 110px;                   
+    height: 50px;                   
+    padding: 2px;               
+    font: 12px Verdana;     
+    background: #dec6b0;    
+    border: 0px;        
+    border-radius: 8px;         
+    pointer-events: none;           
+}
+
+</style>
+</head>
+<body>
+ <p style="text-align: center;"><span style="text-decoration: underline; color: red; font-size: 30px;"><strong>Netflix Content Growth Analysis</strong></span></p>
+ <p style="text-align: center;"><span style="text-decoration: underline; color: red; font-size: 30px;"><strong>Type of Conent (Movies and TV Shows) Growth Chart</strong></span></p>
+    
+<h3 style="text-align: left;">Content Growth by type</h3>
+<p>Netflix has mainly two types of content.</p>
+<p>1.Movies
+   2.TV Show
+</p>
+<p>In the below section we can see the growth of two types of content over the years</p>
+<select id="selectButton"></select>
+<div id="nextpage" style="text-align: right;">
+    <a href="index.html">
+        <button > Back</button>
+    </a>
+    <a href="thirdscene.html">
+        <button > Next</button>
+    </a>
+    </div>
+    <div id="container" class="svg-container"></div>
+    <h2 style="text-align: left;">   </h2>
+    <script>
+    //------------------------1. PREPARATION------------------------//
+//-----------------------------SVG------------------------------//
+var margin = {top: 10, right: 50, bottom: 100, left: 60};
+    var width=900;
+  var height=400;
+// we are appending SVG first
+
+var svg = d3.select("div#container").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
+
+
+//Read the data
+d3.csv("https://raw.githubusercontent.com/mdemuri2/CS416DataVisualization/master/scondscene.csv", function(data) {
+
+// List of groups (here I have one group per column)
+var allGroup = d3.map(data, function(d){return(d.country)}).keys()
+console.log(allGroup)
+// add the options to the button
+d3.select("#selectButton")
+  .selectAll('myOptions')
+     .data(allGroup)
+  .enter()
+    .append('option')
+  .text(function (d) { return d; }) // text showed in the menu
+  .attr("value", function (d) { return d; }) // corresponding value returned by the button
+
+var myColor = d3.scaleOrdinal()
+      .domain(allGroup)
+      .range(["red", "blue"]);
+
+
+// Add X axis --> it is a date format
+var x = d3.scaleLinear()
+  .domain(d3.extent(data, function(d) { return d.year_added; }))
+  .range([ 0, width ]);
+svg.append("g")
+  .attr("transform", "translate(0," + height + ")")
+  .call(d3.axisBottom(x));
+
+// Add Y axis
+var y = d3.scaleLinear()
+  .domain([0, d3.max(data, function(d) { return +d.total_count; })+200])
+  .range([ height, 0 ]);
+svg.append("g")
+  .call(d3.axisLeft(y));
+
+
+// Maria START
+
+  // This allows to find the closest X index of the mouse:
+  var bisect = d3.bisector(function(d) { return d.year_added; }).left
+
+  // Create the circle that travels along the curve of chart
+  var focus = svg
+    .append('g')
+    .append('circle')
+      .style("fill", "none")
+      .attr("stroke", "black")
+      .attr('r', 8.5)
+      .style("opacity", 0)
+
+  // Create the text that travels along the curve of chart
+  var focusText = svg
+    .append('g')
+    .append('text')
+      .style("opacity", 1)
+      .style("fill", "black")
+      .style("font-size", "0.8em")
+      .attr("text-anchor", "left")
+      .attr("alignment-baseline", "middle")
+// MARIA END
+
+
+// MARia START
+// Initialize the first annotation
+// Features of the annotation
+const annotations = [
+  {
+    note: {
+      label: "Here is the annotation label",
+      title: "Initial Annotation",
+      align: "middle",  // try right or left
+      wrap: 200,  // try something smaller to see text split in several lines
+      padding: 10   // More = text lower
+    },
+    color: ["#69b3a2"],
+    x: 160,
+    y: 160,
+    dy: 100,
+    dx: 100
+  }
+]
+
+// Add annotation to the chart
+const makeAnnotations = d3.annotation()
+  .annotations(annotations)
+svg.append("g")
+  .call(makeAnnotations)
+
+
+// MARiA END
+
+// Initialize line with first group of the list
+var line = svg
+  .append('g')
+  .append("path")
+    .datum(data.filter(function(d){return d.country==allGroup[0]}))
+    .attr("d", d3.line()
+      .x(function(d) { return x(d.year_added) })
+      .y(function(d) { return y(+d.total_count) })
+    )
+    .attr("stroke", function(d){ return myColor("MOVIE")} )
+    .style("stroke-width", 2)
+    .style("opacity", 0.7)
+    .style("fill", "none")
+
+
+
+   // MARIA START
+   // Create a rect on top of the svg area: this rectangle recovers mouse position
+    svg
+    .append('rect')
+    .style("fill", "none")
+    .style("pointer-events", "all")
+    .attr('width', width)
+    .attr('height', height)
+    .on('mouseover', mouseover)
+    .on('mousemove', mousemove)
+    .on('mouseout', mouseout);
+
+
+  // What happens when the mouse move -> show the annotations at the right positions.
+  function mouseover() {
+    focus.style("opacity", 1)
+    focusText.style("opacity",1)
+  }
+
+  function mousemove() {
+    // recover coordinate we need
+    var x0 = x.invert(d3.mouse(this)[0]);
+    var i = bisect(data.filter(function(d){return d.country==allGroup[0]}), x0, 1);
+    selectedData = data.filter(function(d){return d.country==allGroup[0]})[i]
+    focus
+      .attr("cx", x(selectedData.year_added))
+      .attr("cy", y(selectedData.total_count))
+    focusText
+      .html("x = " + selectedData.year_added + ",  " + "y = " + selectedData.total_count)
+      .attr("x", x(selectedData.year_added)-50)
+      .attr("y", y(selectedData.total_count)-20)
+    }
+
+  function mousemove_updated() {
+    // recover coordinate we need
+    var x0 = x.invert(d3.mouse(this)[0]);
+    var i = bisect(data.filter(function(d){return d.country==allGroup[0]}), x0, 1);
+    selectedData = data.filter(function(d){return d.country==selectedGroup})[i]
+    focus
+      .attr("cx", x(selectedData.year_added))
+      .attr("cy", y(selectedData.total_count))
+    focusText
+      .html("x:" + selectedData.year_added + "  -  " + "y:" + selectedData.total_count)
+      .attr("x", x(selectedData.year_added)+15)
+      .attr("y", y(selectedData.total_count))
+    }
+
+  function mouseout() {
+    focus.style("opacity", 0)
+    focusText.style("opacity", 0)
+  }
+  // MARIA END
+
+
+// A function that update the chart
+function update(selectedGroup) {
+
+    function mousemove() {
+    // recover coordinate we need
+    var x0 = x.invert(d3.mouse(this)[0]);
+    var i = bisect(data.filter(function(d){return d.country==allGroup[0]}), x0, 1);
+    selectedData = data.filter(function(d){return d.country==selectedGroup})[i]
+    focus
+      .attr("cx", x(selectedData.year_added))
+      .attr("cy", y(selectedData.total_count))
+    focusText
+      .html("x = " + selectedData.year_added + ",  " + "y = " + selectedData.total_count)
+      .attr("x", x(selectedData.year_added)-50)
+      .attr("y", y(selectedData.total_count)-20)
+    }
+
+
+  // Create new data with the selection?
+  var dataFilter = data.filter(function(d){return d.country==selectedGroup})
+
+  // Give these new data to update line
+  line
+      .datum(dataFilter)
+      .transition()
+      .duration(1000)
+      .attr("d", d3.line()
+        .x(function(d) { return x(d.year_added) })
+        .y(function(d) { return y(+d.total_count) })
+      )
+      .attr("stroke", function(d){ return myColor(selectedGroup) })
+
+  // update tool-tip
+  svg.selectAll("rect").remove()
+  svg.append('rect')
+    .style("fill", "none")
+    .style("pointer-events", "all")
+    .attr('width', width)
+    .attr('height', height)
+    .on('mouseover', mouseover)
+    .on('mousemove', mousemove)
+    .on('mouseout', mouseout);
+}
+
+// When the button is changed, run the updateChart function
+d3.select("#selectButton").on("change", function(d) {
+    // recover the option that has been chosen
+    var selectedOption = d3.select(this).property("value")
+    // run the updateChart function with this selected option
+    update(selectedOption)
+})
+
+})
+
+</script>
+</body>
+
+
+

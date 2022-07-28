@@ -1,185 +1,266 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Final Project for CS 498 - Data Visualization Course</title>
-  <meta name="author" content="Tyler Watkins">
-  <meta name="description" content="">
+<meta charset="utf-8">
+<title>Netflix Growth Aalysis</title>
 
-  <link rel="stylesheet" href="css/reset.css">
-  <link rel="stylesheet" href="css/stepper.css">
+<script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+<style>
+    /* AXES */
+    /* ticks */
+    .axis line{
+    stroke: #706f6f;
+    stroke-width: 0.5;
+    shape-rendering: crispEdges;
+    }
+    
+    /* axis contour */
+    .axis path {
+    stroke: #706f6f;
+    stroke-width: 0.7;
+    shape-rendering: crispEdges;
+    }
+    
+    /* axis text */
+    .axis text {
+    fill: #2b2929;
+    font-family: Georgia;
+    font-size: 120%;
+    }
+    
+    /* LINE CHART */
+    path.line-0 {
+    fill: none;
+    stroke: #ed3700;
+    }
+    
+    path.line-1 {
+    fill: none;
+    stroke: #2b2929;
+    stroke-dasharray: 2;
+    }
+    
+    path.line-2 {
+    fill: none;
+    stroke: #9c9c9c;
+    stroke-dasharray: 6;
+    }
+    
+    .line {
+    fill: none;
+    stroke: steelblue;
+    stroke-width: 2;
+}
+    
+    .dot {
+    fill: steelblue;
+    stroke: #fff;
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+}
+div.tooltip {   
+    position: absolute;         
+    text-align: center;         
+    width: 110px;                   
+    height: 50px;                   
+    padding: 2px;               
+    font: 12px Verdana;     
+    background: #dec6b0;    
+    border: 0px;        
+    border-radius: 8px;         
+    pointer-events: none;           
+}
+</style>
 
-  <script src="js/stepper.js"></script>
-  <script src="//d3js.org/d3.v3.min.js"></script>
 </head>
 <body>
-  <div id="container">
-    <h1>CO2 Emissions vs Vehicle Horsepower. Should your next vehicle be less powerful?</h1>
-    <h2 class="subtitle">Visualization is based on data from the Environment Protection Agency of 4,411 vehicles manufactured in 2015.</h2>
-    <div id="vis-nav">
-      <a href="#" id="step1" class="step-link active">Viz-Scene 1</a>
-      <a href="#" id="step2" class="step-link">Viz-Scene 2</a>
-      <a href="#" id="step3" class="step-link">Viz-Scene 3</a>
-      <a href="https://github.com/tylerwatkins101/cs498-visualization-project/blob/master/README.md" target="_blank" class="desc-link">About the Visualization</a>
-
+    <p style="text-align: center;"><span style="text-decoration: underline; color: red; font-size: 30px;"><strong>Netflix Growth Analysis</strong></span></p>
+    <p style="text-align: center;"><span style="text-decoration: underline; color: red; font-size: 30px;"><strong>Multi Line Chart</strong></span></p>
+    
+<h3 style="text-align: left;">About Netflix</h3>
+<p>Netflix has been leading the way for digital content since 1997 Netflix is the world's leading streaming entertainment service with 193 million paid memberships in over 190 countries enjoying TV series, documentaries and feature films across a wide variety of genres and languages. Members can watch as much as they want, anytime, anywhere, on any internet-connected screen. Members can play, pause and resume watching, all without commercials or commitments.Below chart shows content growth over time and different milestones(Source-https://en.wikipedia.org/wiki/Timeline_of_Netflix)</p>
+<div id="nextpage" style="text-align: right;">
+    <a href="scondscene.html">
+        <button> Contect growth based on Type</button>
+    </a>
     </div>
-    <div id="vis-container">
-      <div id="annotation-steps">
-        <div class="annotation-step" id="step1-annotation" style="display:block;">
-          <div class="annotation" id="step1-high-annotation" >
-            <h4>As horsepower increases C02 emissions increase for all vehicle types.</h4>
-                		  
-          </div>
-         </div>
-        <div class="annotation-step" id="step2-annotation">
-          <div class="annotation" id="step2-high-annotation" >
-	    <h4>Mouseover the data to see the individual trends for Cars, Trucks or SUVs.</h4>
-				
-          </div>
-        </div>
-	<div class="annotation-step" id="step3-annotation">
-          <div class="annotation" id="step3-high-annotation" >
-	    <h4>No matter what type of vehicle you choose. Maybe your next purchase should be less powerful?</h4>
-		
-          </div>
-        </div>
-      </div>
-     <div id="vis-canvas"> 
-	     
-      <style>
+    <div><h3 style="text-align: center; color: #ff0505f5;">Netflix Content Growth Over The Year </h3></div>   
+<div id="container" class="svg-container"></div>
+<h4>Please hover over the dots to view more details</h4>
+<script>
+//------------------------1. PREPARATION------------------------//
+//-----------------------------SVG------------------------------//
+var margin = {top: 10, right: 50, bottom: 50, left: 60};
+   // width = 460 - margin.left - margin.right,
+   // height = 400 - margin.top - margin.bottom;
+    var width=900;
+  var height=400;
+// we are appending SVG first
 
-	.axis path,
-	.axis line {
-	  fill: none;
-	  stroke: #000;
-	  shape-rendering: crispEdges;
-	}
+var svg = d3.select("div#container").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform",
+            "translate(" + margin.left + "," + margin.top + ")");
 
-	.dot {
-	  stroke: #000;
-	}
+//-----------------------------DATA-----------------------------//
+const timeConv = d3.timeParse("%Y");
+const dataset = d3.csv("https://raw.githubusercontent.com/mdemuri2/CS416DataVisualization/master/Netflix_ratingbyyearcountry.csv");
+dataset.then(function(data) {
 
-	</style>
+    data.forEach(function(d) {
+        d.year_added = timeConv(d.year_added);
+        d.type = d['type'];
+        d.country = d['country'];
+        d.total_count = d['total_count'];
+        //console.log(d)
+      });
 
-	<script>
+      var div = d3.select("div#container").append("div")    
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+    //console.log(data)
+ 
+    var countbyyear = d3.nest()
+  .key(function(d) { return (d.year_added); })
+  .rollup(function(v) { return d3.sum(v, function(d) { return d.total_count; }); })
+  .entries(data);
+  countbyyear.forEach(function(d) {
+        d.key = d3.timeFormat("%Y")(new Date(d.key));
+        d.value = d['value'];
+        //console.log(d)
+      });
 
-	// Set the dimensions of the canvas / graph
-	var margin = {top: 50, right: 20, bottom: 30, left: 80},
-	    width = 940 - margin.left - margin.right,
-	    height = 500 - margin.top - margin.bottom;
 
-	// Set the ranges
-	var x = d3.scale.linear()
-	    .range([0, width]);
-	var y = d3.scale.linear()
-	    .range([height, 0]);
+console.log(countbyyear)
 
-	var color = d3.scale.category10();
+//----------------------------SCALES----------------------------//
+const xScale = d3.scaleTime().range([0,width]);
+const yScale = d3.scaleLinear().rangeRound([height, 0]);
+xScale.domain(d3.extent(countbyyear, function(d){
+    return d3.timeParse("%Y")(d.key)}));
 
-	// Define the axes
-	var xAxis = d3.svg.axis()
-	    .scale(x)
-	    .orient("bottom");
+yScale.domain([(0), d3.max(countbyyear, function(d){
+    return (d.value)})]);
 
-	var yAxis = d3.svg.axis()
-	    .scale(y)
-	    .orient("left");
 
-	// Add the svg canvas
-	var svg = d3.select("#vis-canvas").append("svg")
-	    .attr("width", width + margin.left + margin.right)
-	    .attr("height", height + margin.top + margin.bottom)
-	  .append("g")
-	    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-	// Get the data
-	d3.csv("https://raw.githubusercontent.com/tylerwatkins101/cs498-visualization-project/master/data/epa2015_final.csv", function(error, data) {
-	  if (error) throw error;
+//-----------------------------AXES-----------------------------//
+const yaxis = d3.axisLeft()
+    .scale(yScale);
 
-	  data.forEach(function(d) {
-	    d.CO2 = +d.CO2;
-	    d.horse = +d.horse;
-	  });
 
-	// Scale the range of the data
-	  x.domain(d3.extent(data, function(d) { return d.horse; })).nice();
-	  y.domain(d3.extent(data, function(d) { return d.CO2; })).nice();
+const xaxis = d3.axisBottom()
+    .tickFormat(d3.timeFormat('%Y'))
+    .scale(xScale);
 
-	// Add the X Axis
-	  svg.append("g")
-	      .attr("class", "x axis")
-	      .attr("transform", "translate(0," + height + ")")
-	      .call(xAxis)
-	    .append("text")
-	      .attr("class", "label")
-	      .attr("x", width)
-	      .attr("y", -6)
-	      .style("text-anchor", "end")
-	      .text("Rated Horsepower (foot-pounds per second)");
 
-	// Add the Y Axis
-	  svg.append("g")
-	      .attr("class", "y axis")
-	      .call(yAxis)
-	    .append("text")
-	      .attr("class", "label")
-	      .attr("transform", "rotate(-90)")
-	      .attr("y", 6)
-	      .attr("dy", ".71em")
-	      .style("text-anchor", "end")
-	      .text("CO2 Emissions (grams per mile)")
+//----------------------------LINES-----------------------------//
+var valueline = d3.line()
+    .x(function(d) { return xScale(new Date(d.key)); })
+    .y(function(d) { return  yScale((d.value)); });
 
-	// Add the Scatterplot
-	  svg.selectAll(".dot")
-	      .data(data)
-	    .enter().append("circle")
-	      .attr("class", "dot")
-	      .attr("r", 3.5)
-	      .attr("cx", function(d) { return x(d.horse); })
-	      .attr("cy", function(d) { return y(d.CO2); })
-	      .style("fill", function(d) { return color(d.type); })
-	      .on("mouseover", function(d){
-        	  d3.selectAll('.dot')
-            	   .filter(function(dot){ 
-                    return (dot.type != d.type) 
-                   })
-                   .transition()
-                   .style("opacity", 0.01)
-          })
-              .on("mouseout", function(d){
-               d3.selectAll('.dot')
-                .filter(function(dot){ 
-                 return (dot.type != d.type) 
-                })
-                .transition()
-                .style("opacity", 1)
-          });
+ svg.append("path")
+ .datum(countbyyear)
+      .attr("class", "line")
+      .attr("d", valueline);
 
-	// Add the Legend
-	  var legend = svg.selectAll(".legend")
-	      .data(color.domain())
-	    .enter().append("g")
-	      .attr("class", "legend")
-	      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+        svg.selectAll(".dot")
+      .data(countbyyear)
+  .enter().append("circle") // Uses the enter().append() method
+    .attr("class", "dot") // Assign a class for styling
+    .attr("cx", function(d) {  return xScale(new Date(d.key));})
+    .attr("cy", function(d) { return yScale(d.value);})
+    .attr("r", 4)
+    .on("mouseover", function(d) {      
+        div.transition()        
+            .duration(200)      
+            .style("opacity", .9);      
 
-	  legend.append("rect")
-	      .attr("x", width - 18)
-	      .attr("width", 18)
-	      .attr("height", 18)
-	      .style("fill", color);
+        div .html("Year_added: " + d.key +  "<br>Count:" + d.value )    
+            .style("left", (d3.event.pageX) + "px")     
+            .style("top", (d3.event.pageY - 84) + "px");    
+        })                  
+      .on("mouseout", function(d) {     
+    div.transition()        
+        .duration(500)      
+        .style("opacity", 0);   
+    });
+//-----------------------------AXES-----------------------------//
 
-	  legend.append("text")
-	      .attr("x", width - 24)
-	      .attr("y", 9)
-	      .attr("dy", ".35em")
-	      .style("text-anchor", "end")
-	      .text(function(d) { return d; });
+svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xaxis)
+    .append("text")
+    .attr("x", 265 )
+    .attr("dx","10em")
+    .attr("dy","3.5em")
+    .style("text-anchor", "start")
+    .text("Year_added");
 
-	});
+svg.append("g")
+    .attr("class", "axis")
+    .call(yaxis)
+    .append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x","-260")
+    .attr("dx","10em")
+    .attr("dy","-3.5em")
+    .style("text-anchor", "end")
+    .text("Count");
 
-	</script>
-     </div>
-    </div>
-  </div>
+    
+
+
+//---Annotation-----//
+
+//annotation 
+    svg.append("g").append('line').attr("class","ant1").style("stroke", "black")
+    .attr("x1", 150).attr("y1", 400).attr("x2", 150).attr("y2",300);
+    svg.append("g").append("text").attr("class","ant1").attr("x", 100).attr("y", 50).attr("dy","17em").text("Netflix starts expanding ")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant1").attr("x", 100).attr("y", 50).attr("dy","18em").text("its streaming service")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant1").attr("x", 100).attr("y", 50).attr("dy","19em").text("to the international market-")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant1").attr("x", 100).attr("y", 50).attr("dy","20em").text("starting with Canada.")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").selectAll(".ant1").attr("transform", "translate(180,350)");
+
+    svg.append("g").append('line').attr("class","ant2").style("stroke", "black")
+    .attr("x1", 375).attr("y1", 400).attr("x2", 375).attr("y2",250);
+    svg.append("g").append("text").attr("class","ant2").attr("x", 300).attr("y", 50).attr("dy","15em").text("Netflix starts streaming ")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant2").attr("x", 300).attr("y", 50).attr("dy","16em").text("House of Cards, ")
+    .style("font-size", "12px").style("font-weight", "bold");
+    svg.append("g").append("text").attr("class","ant2").attr("x", 300).attr("y", 50).attr("dy","17em").text("its first original content.")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").selectAll(".ant2").attr("transform", "translate(180,350)");
+
+    svg.append("g").append('line').attr("class","ant3").style("stroke", "black")
+    .attr("x1", 600).attr("y1", 400).attr("x2", 600).attr("y2",200);
+    svg.append("g").append("text").attr("class","ant3").attr("x", 550).attr("y", 150).attr("dy","2em").text("Netflix announces   ")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant3").attr("x", 550).attr("y", 150).attr("dy","3em").text("that it will launch ")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant3").attr("x", 550).attr("y", 150).attr("dy","4em").text("originals targeting kids")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").selectAll(".ant3").attr("transform", "translate(180,350)");
+
+    svg.append("g").append('line').attr("class","ant4").style("stroke", "black")
+    .attr("x1", 675).attr("y1", 400).attr("x2", 675).attr("y2",130);
+    svg.append("g").append("text").attr("class","ant4").attr("x", 650).attr("y", 150).attr("dy","-5em").text("A study showed that ")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant4").attr("x", 650).attr("y", 150).attr("dy","-4em").text("the number of Netflix subscribers")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant4").attr("x", 650).attr("y", 150).attr("dy","-3em").text("now equal that of")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").append("text").attr("class","ant4").attr("x", 650).attr("y", 150).attr("dy","-2em").text("all the cable subscribers combined; ")
+    .style("font-size", "12px").style("font-weight", "normal");
+    svg.append("g").selectAll(".ant4").attr("transform", "translate(180,350)");
+
+});
+</script>
 </body>
+</html>
