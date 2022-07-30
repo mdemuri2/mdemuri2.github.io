@@ -55,19 +55,43 @@
     <p style="text-align: center;"><span style="color: #006666; font-size: 30px; font-family: Verdana">Netflix Growth Analysis</span></p>
     <p style="text-align: center;"><span style="color: #009999; font-size: 26px; font-family: Verdana">Total Amount of Content Added by a Given Country in a Given Year</span></p>   
     
-<h3 style="text-align: left;">About Netflix</h3>
-<p>This chart shows content growth over the years for different country.In 2010 	Netflix starts expanding its streaming service to the international market, starting with Canada.
-</p>
-<p>information Source https://en.wikipedia.org/wiki/Timeline_of_Netflix</p>
+<h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Background</h3>
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">In 2008 Netflix started it streaming service in the United States. In 2010 Netflix started expanding to international markets, beginning with Canada. In 2016 Netflix had a major international expansion making the service available nearly worldwide</p>
+
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">The chart documents the amount of content (total number of movies and TV shows), produced by a given country, that were added to the platform in a given year.</p>
+
+<h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Slide Messaging</h3>
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">As show by clicking through different countries in the drop-down menu, the US produced the vast majority of the content added to platform. This makes sense because the US is Netflix’s first and largest market, thus the majority of Netflix’s revenue (43%) comes from the US. The amount of content produced by the US and added to the platform had an elbow point at 2015.  This aligns with the 2015 revenue elbow point. This suggests that there is a correlation between the amount of content produced by a given country and the revenue associated with that country.  Netflix could potentially increase its revenue in international markets by adding additional internationally produced content.</p>
 <select id="selectButton"></select>
 
 <div id="nextpage" style="text-align: right;">
     <a href="index.html">
-        <button> Back to First Slide</button>
+        <button >1.Revenue Growth</button>
+    </a>
+    <a href="scene_2.html">
+        <button> 2.Content Type Growth</button>
+    </a>
+    <a href="scene_3.html">
+        <button>3.Country Content Growth</button>
     </a>
     </div>
     <div id="container" class="svg-container"></div>
-    <script>
+
+<h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Interaction Instructions</h3>
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">Hover over the chart’s line to view the specific values for the year and amount of content added at a given point in the chart.</p>
+
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">Use the drop-down menu in the upper lefthand corner of the chart to view the total amount of content (total number of movies and TV shows), produced by a given country, that were added to the platform in a given year. In other words the drop-down menu switches the country of interest.</p>
+
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana"><i>Proceed to next scenes<i></p>
+
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">
+    <ol>
+    <li style="text-align: left; font-size: 11.5px; font-family: Verdana">To get to the first slide click on the “1. Revenue Growth” button</li>
+    <li style="text-align: left; font-size: 11.5px; font-family: Verdana">To get to the previous slide click on the “2. Content Type Growth” button</li>
+    <li style="text-align: left; font-size: 11.5px; font-family: Verdana">The current slide is the “3. Country Content Growth” button</li>
+    </ol> 
+</p>
+<script>
     //------------------------1. PREPARATION------------------------//
 //-----------------------------SVG------------------------------//
 var margin = {top: 10, right: 50, bottom: 100, left: 125};
@@ -132,7 +156,7 @@ var focus = svg
   .append('g')
   .append('circle')
     .style("fill", "none")
-    .attr("stroke", "black")
+    .attr("stroke", "#b47e4b")
     .attr('r', 8.5)
     .style("opacity", 0)
 
@@ -141,7 +165,7 @@ var focusText = svg
   .append('g')
   .append('text')
     .style("opacity", 1)
-    .style("fill", "black")
+    .style("fill", "#b47e4b")
     .style("font-size", "0.8em")
     .attr("text-anchor", "left")
     .attr("alignment-baseline", "middle")

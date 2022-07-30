@@ -70,24 +70,44 @@ div.tooltip {
 <body>
     <p style="text-align: center;"><span style="color: #006666; font-size: 30px; font-family: Verdana">Netflix Growth Analysis</span></p>
     <p style="text-align: center;"><span style="color: #009999; font-size: 26px; font-family: Verdana">Content (Movies and TV Shows) Growth</span></p>    
-<h3 style="text-align: left;">Content Growth by type</h3>
-<p>Netflix has mainly two types of content.</p>
-<p>1.Movies
-   2.TV Show
-</p>
-<p>In the below section we can see the growth of two types of content over the years</p>
+
+<h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Background</h3>
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">Netflix mainly has two types of content, specifically movies and TV shows. The chart documents the number of content (i.e., movies, TV shows or both) were added to the platform in a given year, on a worldwide scale.</p>
+
+<h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Slide Messaging</h3>
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">All three groupings (“MOVIE + TV SHOW”, “MOVIE”, “TV SHOW”) have an elbow point at 2015, marking the beginning of Netflix’s high growth in terms of content. This elbow point at 2015 aligns with the elbow point of revenue seen on the previous slide. This suggests that revenue and the amount of content added are potentially correlated. Also note that the amount of “MOVIE” content added experiences a plateau in 2018. The “MOVIE + TV SHOW” and “TV SHOW” didn’t exhibit a plateau in 2018 nor did revenue in the previous chart. Thus, this suggests that revenue is more so correlated with amount of total content (movies and TV shows combined) rather than in singularity movies.</p>
+
 <select id="selectButton"></select>
 <div id="nextpage" style="text-align: right;">
     <a href="index.html">
-        <button > Back</button>
+        <button >1.Revenue Growth</button>
     </a>
-    <a href="thirdscene.html">
-        <button > Next</button>
+    <a href="scene_2.html">
+        <button> 2.Content Type Growth</button>
+    </a>
+    <a href="scene_3.html">
+        <button>3.Country Content Growth</button>
     </a>
     </div>
     <div id="container" class="svg-container"></div>
     <h2 style="text-align: left;">   </h2>
-    <script>
+
+
+<h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Interaction Instructions</h3>
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">Hover over the chart’s line to view the specific values for the year and amount of content added at a given point in the chart.</p>
+
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">Use the drop-down menu in the upper lefthand corner of the chart to view the total amount of content added including both movies and TY shows together or singularly either movies or TV shows.</p>
+
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana"><i>Proceed to next scenes<i></p>
+
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana">
+    <ol>
+    <li style="text-align: left; font-size: 11.5px; font-family: Verdana">To get to the previous slide click on the “1. Revenue Growth” button</li>
+    <li style="text-align: left; font-size: 11.5px; font-family: Verdana">The current slide is the “2. Content Type Growth” button</li>
+    <li style="text-align: left; font-size: 11.5px; font-family: Verdana">To get to the next slide click on the “3. Country Content Growth” button</li>
+    </ol> 
+</p>
+<script>
     //------------------------1. PREPARATION------------------------//
 //-----------------------------SVG------------------------------//
 var margin = {top: 10, right: 50, bottom: 100, left: 125};
@@ -157,7 +177,7 @@ svg.append("g")
     .append('g')
     .append('circle')
       .style("fill", "none")
-      .attr("stroke", "black")
+      .attr("stroke", "#b47e4b")
       .attr('r', 8.5)
       .style("opacity", 0)
 
@@ -166,7 +186,7 @@ svg.append("g")
     .append('g')
     .append('text')
       .style("opacity", 1)
-      .style("fill", "black")
+      .style("fill", "#b47e4b")
       .style("font-size", "0.8em")
       .attr("text-anchor", "left")
       .attr("alignment-baseline", "middle")
