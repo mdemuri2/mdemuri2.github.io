@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <head>
 <meta charset="utf-8">
-<title>Multi Line Chart</title>
+<title>Scene 2</title>
 <script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
 <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
 <style>
@@ -25,7 +25,7 @@
     /* axis text */
     .axis text {
     fill: #2b2929;
-    font-family: Georgia;
+    font-family: Verdana;
     font-size: 120%;
     }
     
@@ -55,7 +55,7 @@
 div.tooltip {   
     position: absolute;         
     text-align: center;         
-    width: 110px;                   
+    width: 190px;                   
     height: 50px;                   
     padding: 2px;               
     font: 12px Verdana;     
@@ -68,9 +68,8 @@ div.tooltip {
 </style>
 </head>
 <body>
- <p style="text-align: center;"><span style="text-decoration: underline; color: red; font-size: 30px;"><strong>Netflix Content Growth Analysis</strong></span></p>
- <p style="text-align: center;"><span style="text-decoration: underline; color: red; font-size: 30px;"><strong>Type of Conent (Movies and TV Shows) Growth Chart</strong></span></p>
-    
+    <p style="text-align: center;"><span style="color: #006666; font-size: 30px; font-family: Verdana">Netflix Growth Analysis</span></p>
+    <p style="text-align: center;"><span style="color: #009999; font-size: 26px; font-family: Verdana">Content (Movies and TV Shows) Growth</span></p>    
 <h3 style="text-align: left;">Content Growth by type</h3>
 <p>Netflix has mainly two types of content.</p>
 <p>1.Movies
@@ -91,7 +90,7 @@ div.tooltip {
     <script>
     //------------------------1. PREPARATION------------------------//
 //-----------------------------SVG------------------------------//
-var margin = {top: 10, right: 50, bottom: 100, left: 60};
+var margin = {top: 10, right: 50, bottom: 100, left: 125};
     var width=900;
   var height=400;
 // we are appending SVG first
@@ -105,7 +104,7 @@ var svg = d3.select("div#container").append("svg")
 
 
 //Read the data
-d3.csv("https://raw.githubusercontent.com/mdemuri2/CS416DataVisualization/master/scondscene.csv", function(data) {
+d3.csv("https://raw.githubusercontent.com/mdemuri2/CS416DataVisualization/master/scene_2.csv", function(data) {
 
 // List of groups (here I have one group per column)
 var allGroup = d3.map(data, function(d){return(d.country)}).keys()
@@ -121,7 +120,7 @@ d3.select("#selectButton")
 
 var myColor = d3.scaleOrdinal()
       .domain(allGroup)
-      .range(["red", "blue"]);
+      .range(["steelblue", "orange", "olive"]);
 
 
 // Add X axis --> it is a date format
@@ -130,7 +129,15 @@ var x = d3.scaleLinear()
   .range([ 0, width ]);
 svg.append("g")
   .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x));
+ // .call(d3.axisBottom(x));
+
+var parseTime = d3.timeParse("%Y");
+ var x_2 = d3.scaleTime()
+  .domain(d3.extent(data, function(d) { return parseTime(d.year_added); }))
+  .range([ 0, width ]);
+svg.append("g")
+  .attr("transform", "translate(0," + height + ")")
+  .call(d3.axisBottom(x_2));
 
 // Add Y axis
 var y = d3.scaleLinear()
@@ -172,17 +179,18 @@ svg.append("g")
 const annotations = [
   {
     note: {
-      label: "Here is the annotation label",
-      title: "Initial Annotation",
+      label: "Like revenue, 2015 appears to be an elbow point in the graph, marking the beginning of Netflix’s high growth in terms of the amount of content added to their platform",
+      title: "2015",
       align: "middle",  // try right or left
       wrap: 200,  // try something smaller to see text split in several lines
       padding: 10   // More = text lower
     },
+
     color: ["#69b3a2"],
-    x: 160,
-    y: 160,
-    dy: 100,
-    dx: 100
+    x: 560,
+    y: 350,
+    dy: -120,
+    dx: -50
   }
 ]
 
@@ -190,7 +198,11 @@ const annotations = [
 const makeAnnotations = d3.annotation()
   .annotations(annotations)
 svg.append("g")
-  .call(makeAnnotations)
+.style("font-family", "Verdana")
+.style("font-size", "11px")
+.call(makeAnnotations)
+
+
 
 
 // MARiA END
@@ -204,9 +216,9 @@ var line = svg
       .x(function(d) { return x(d.year_added) })
       .y(function(d) { return y(+d.total_count) })
     )
-    .attr("stroke", function(d){ return myColor("MOVIE")} )
+    .attr("stroke", function(d){ return myColor("MOVIE + TV SHOW")} )
     .style("stroke-width", 2)
-    .style("opacity", 0.7)
+    .style("opacity", 0.8)
     .style("fill", "none")
 
 
@@ -232,6 +244,7 @@ var line = svg
 
   function mousemove() {
     // recover coordinate we need
+
     var x0 = x.invert(d3.mouse(this)[0]);
     var i = bisect(data.filter(function(d){return d.country==allGroup[0]}), x0, 1);
     selectedData = data.filter(function(d){return d.country==allGroup[0]})[i]
@@ -242,20 +255,8 @@ var line = svg
       .html("x = " + selectedData.year_added + ",  " + "y = " + selectedData.total_count)
       .attr("x", x(selectedData.year_added)-50)
       .attr("y", y(selectedData.total_count)-20)
-    }
 
-  function mousemove_updated() {
-    // recover coordinate we need
-    var x0 = x.invert(d3.mouse(this)[0]);
-    var i = bisect(data.filter(function(d){return d.country==allGroup[0]}), x0, 1);
-    selectedData = data.filter(function(d){return d.country==selectedGroup})[i]
-    focus
-      .attr("cx", x(selectedData.year_added))
-      .attr("cy", y(selectedData.total_count))
-    focusText
-      .html("x:" + selectedData.year_added + "  -  " + "y:" + selectedData.total_count)
-      .attr("x", x(selectedData.year_added)+15)
-      .attr("y", y(selectedData.total_count))
+
     }
 
   function mouseout() {
@@ -316,6 +317,24 @@ d3.select("#selectButton").on("change", function(d) {
     // run the updateChart function with this selected option
     update(selectedOption)
 })
+
+//-----------------------------AXES LABELS-----------------------------//
+
+svg.append("text")
+    .attr("class","ant2")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -322).attr("y", -230)
+    .attr("dy","16em").text("Total Amount of Content Added in a Given Year")
+    .style("font-size", "11.5px").style("font-family", "Verdana");
+svg.append("g").selectAll(".ant2").attr("transform", "translate(180,350)")
+
+svg.append("text")
+    .attr("class","ant2")
+    .attr("x", 435).attr("y", 255)
+    .attr("dy","16em").text("Year")
+    .style("font-size", "11.5px").style("font-family", "Verdana");
+svg.append("g").selectAll(".ant2").attr("transform", "translate(180,350)")
+
 
 })
 
