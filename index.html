@@ -75,13 +75,13 @@ div.tooltip {
 </head>
 <body>
     <p style="text-align: center;"><span style="color: #006666; font-size: 30px; font-family: Verdana">Netflix Growth Analysis</span></p>
-    <p style="text-align: center;"><span style="color: #009999; font-size: 26px; font-family: Verdana">Revenue Growth</span></p>
+    <p style="text-align: center;"><span style="color: #009999; font-size: 26px; font-family: Verdana">1.Revenue Growth</span></p>
 
 <h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Background</h3>
 <p style="text-align: left; font-size: 11.5px; font-family: Verdana">Netflix is a screaming service for various types of films. It operates based on a subscription system. The company started its streaming service 2008 in the United States. It has since grown to be an international company. Netflix has the highest subscriber count in the United States and the majority of Netflix’s revenue (43%) comes from the US.</p>
 <p style="text-align: left; font-size: 11.5px; font-family: Verdana">Netflix has grown quickly. The main goal of this analysis was to examine when Netflix began to experience high growth in terms of revenue and how their service changed during that time.</p>
 
-<h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Overall Messaging</h3>
+<h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Key Take Away Message of Interactive Slideshow</h3>
 <p style="text-align: left; font-size: 11.5px; font-family: Verdana">As these three slides will illustrate, 2015 marks the start of Netflix’s high growth phase in terms of revenue. The year 2015 also marks the start of when Netflix began to add a lot of content to their platform, specifically American produced content.</p>
 
 <h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Slide Specific Messaging</h3>
@@ -102,7 +102,7 @@ div.tooltip {
 <h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Interaction Instructions</h3>
 <p style="text-align: left; font-size: 11.5px; font-family: Verdana">Hover over the data points in brown to view additional details about the number of subscribers for a given year along with the average hours of consumption per day per subscriber worldwide.</p>
 
-<p style="text-align: left; font-size: 11.5px; font-family: Verdana"><i>Proceed to next scenes<i></p>
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana"><i>Proceed to next scene<i></p>
 
 <p style="text-align: left; font-size: 11.5px; font-family: Verdana">
     <ol>
@@ -157,13 +157,8 @@ dataset.then(function(data) {
   countbyyear.forEach(function(d) {
         d.key = d3.timeFormat("%Y")(new Date(d.key));
         d.value = d['value'];
-        //console.log(d)
       });
 
-
-
-//console.log(countbyyear)
-//console.log(countbysub)
 
 //----------------------------SCALES----------------------------//
 const xScale = d3.scaleTime().range([0,width]);
@@ -199,7 +194,7 @@ const annotations = [
       padding: 10   // More = text lower
     },
 
-    color: ["#69b3a2"],
+    color: ["red"],
     x: 545,
     y: 230,
     dy: -130,
@@ -230,8 +225,8 @@ var valueline = d3.line()
 
         svg.selectAll(".dot")
       .data(data)
-  .enter().append("circle") // Uses the enter().append() method
-    .attr("class", "dot") // Assign a class for styling
+  .enter().append("circle") 
+    .attr("class", "dot") 
     .attr("cx", function(d) {  return xScale(new Date(d.year_added));})
     .attr("cy", function(d) { return yScale(d.revenue);})
     .attr("r", 4)
@@ -242,7 +237,7 @@ var valueline = d3.line()
 
         div .html("Total Subscribers: " + d.subscribers +  "<br>Daily Consumption (hr.) per Subscriber:" + d.hours_per_subscriber )    
             .style("left", (d3.event.pageX) + "px")     
-            .style("top", (d3.event.pageY - 70) + "px");    // 84
+            .style("top", (d3.event.pageY - 70) + "px");   
         })                  
       .on("mouseout", function(d) {     
     div.transition()        

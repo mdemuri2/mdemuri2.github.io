@@ -69,7 +69,7 @@ div.tooltip {
 </head>
 <body>
     <p style="text-align: center;"><span style="color: #006666; font-size: 30px; font-family: Verdana">Netflix Growth Analysis</span></p>
-    <p style="text-align: center;"><span style="color: #009999; font-size: 26px; font-family: Verdana">Content (Movies and TV Shows) Growth</span></p>    
+    <p style="text-align: center;"><span style="color: #009999; font-size: 26px; font-family: Verdana">2.Content Type Growth</span></p>    
 
 <h3 style="text-align: left; font-size: 11.5px; font-family: Verdana">Background</h3>
 <p style="text-align: left; font-size: 11.5px; font-family: Verdana">Netflix mainly has two types of content, specifically movies and TV shows. The chart documents the number of content (i.e., movies, TV shows or both) were added to the platform in a given year, on a worldwide scale.</p>
@@ -98,7 +98,7 @@ div.tooltip {
 
 <p style="text-align: left; font-size: 11.5px; font-family: Verdana">Use the drop-down menu in the upper lefthand corner of the chart to view the total amount of content added including both movies and TY shows together or singularly either movies or TV shows.</p>
 
-<p style="text-align: left; font-size: 11.5px; font-family: Verdana"><i>Proceed to next scenes<i></p>
+<p style="text-align: left; font-size: 11.5px; font-family: Verdana"><i>Proceed to next scene<i></p>
 
 <p style="text-align: left; font-size: 11.5px; font-family: Verdana">
     <ol>
@@ -126,7 +126,7 @@ var svg = d3.select("div#container").append("svg")
 //Read the data
 d3.csv("https://raw.githubusercontent.com/mdemuri2/CS416DataVisualization/master/scene_2.csv", function(data) {
 
-// List of groups (here I have one group per column)
+
 var allGroup = d3.map(data, function(d){return(d.country)}).keys()
 console.log(allGroup)
 // add the options to the button
@@ -135,12 +135,12 @@ d3.select("#selectButton")
      .data(allGroup)
   .enter()
     .append('option')
-  .text(function (d) { return d; }) // text showed in the menu
-  .attr("value", function (d) { return d; }) // corresponding value returned by the button
+  .text(function (d) { return d; }) 
+  .attr("value", function (d) { return d; }) 
 
 var myColor = d3.scaleOrdinal()
       .domain(allGroup)
-      .range(["steelblue", "orange", "olive"]);
+      .range(["steelblue", "PURPLE", "olive"]);
 
 
 // Add X axis --> it is a date format
@@ -167,7 +167,6 @@ svg.append("g")
   .call(d3.axisLeft(y));
 
 
-// Maria START
 
   // This allows to find the closest X index of the mouse:
   var bisect = d3.bisector(function(d) { return d.year_added; }).left
@@ -190,10 +189,8 @@ svg.append("g")
       .style("font-size", "0.8em")
       .attr("text-anchor", "left")
       .attr("alignment-baseline", "middle")
-// MARIA END
 
 
-// MARia START
 // Initialize the first annotation
 // Features of the annotation
 const annotations = [
@@ -201,12 +198,12 @@ const annotations = [
     note: {
       label: "Like revenue, 2015 appears to be an elbow point in the graph, marking the beginning of Netflix’s high growth in terms of the amount of content added to their platform",
       title: "2015",
-      align: "middle",  // try right or left
-      wrap: 200,  // try something smaller to see text split in several lines
-      padding: 10   // More = text lower
+      align: "middle",  
+      wrap: 200,  
+      padding: 10   
     },
 
-    color: ["#69b3a2"],
+    color: ["red"],
     x: 560,
     y: 350,
     dy: -120,
@@ -223,10 +220,6 @@ svg.append("g")
 .call(makeAnnotations)
 
 
-
-
-// MARiA END
-
 // Initialize line with first group of the list
 var line = svg
   .append('g')
@@ -241,9 +234,6 @@ var line = svg
     .style("opacity", 0.8)
     .style("fill", "none")
 
-
-
-   // MARIA START
    // Create a rect on top of the svg area: this rectangle recovers mouse position
     svg
     .append('rect')
@@ -256,14 +246,12 @@ var line = svg
     .on('mouseout', mouseout);
 
 
-  // What happens when the mouse move -> show the annotations at the right positions.
   function mouseover() {
     focus.style("opacity", 1)
     focusText.style("opacity",1)
   }
 
   function mousemove() {
-    // recover coordinate we need
 
     var x0 = x.invert(d3.mouse(this)[0]);
     var i = bisect(data.filter(function(d){return d.country==allGroup[0]}), x0, 1);
@@ -283,10 +271,7 @@ var line = svg
     focus.style("opacity", 0)
     focusText.style("opacity", 0)
   }
-  // MARIA END
-
-
-// A function that update the chart
+  
 function update(selectedGroup) {
 
     function mousemove() {
